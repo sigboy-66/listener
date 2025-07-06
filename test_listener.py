@@ -6,7 +6,8 @@
 #               4. The reciever exits gracefully when no log path is given
 #               5. Sender exits if no reciever is running
 #               6. Receiver exits gracefully if it cant write to the specified log file
-# Usage:        pytest -s --html=report.html --self-contained-html --log-file=pytestout.log test_listener.py
+#
+# Usage:        pytest --html=report.html --self-contained-html --log-file=pytestout.log test_listener.py
 
 import subprocess
 import time

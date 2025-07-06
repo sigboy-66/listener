@@ -2,6 +2,7 @@
 # Description:  Sends number of heartbeats specified on the command line to receiver.py via a tcp socket. If not
 #               specified on the command line the default is 1000. Each heartbeat is sent every config.heartbeat_interval
 #               number of seconds.
+#
 # Usage:        python sender.py <number-of-heartbeats-to-send>
 
 import socket

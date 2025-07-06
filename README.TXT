@@ -1,8 +1,8 @@
-The Repo exists at https://github.com/sigboy-66/tc-listener.git
+The Repo exists at https://github.com/sigboy-66/listener.git
 
 You must have git installed. Execute the following command to get the listener code
 
-git clone https://github.com/sigboy-66/tc-listener.git
+git clone https://github.com/sigboy-66/listener.git
 
 Requirements: Environment must have git and python installed
 Also must have pytest and pytest-html installed

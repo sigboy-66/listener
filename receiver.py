@@ -1,6 +1,7 @@
-# Module:       reciever.py
+# Module:       receiver.py
 # Description:  Opens up a tcp socket on port config.tcp_port and logs each heartbeat to the log file specified
 #               on the command line. The receiver exits upon the client closing the connection
+#
 # Usage:        python receiver <heartbeat-log-file>
 
 import socket

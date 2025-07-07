@@ -3,19 +3,21 @@
 #               on the command line. The receiver exits upon the client closing the connection
 #
 # Usage:        python receiver <heartbeat-log-file>
-
+import os
 import socket
 import sys
 from datetime import datetime
-from config import TCP_PORT
+from config import TCP_PORT, DEFAULT_LOG, LISTENER_IP
 
-# expect a log file path
-if len(sys.argv) != 2:
-    print("Usage: python receiver.py <log_file>")
-    sys.exit(1)
+log_file = DEFAULT_LOG
 
-log_file = sys.argv[1]
-ip = '0.0.0.0'  # Listen for all
+# if log file on command line change the name/path of the heartbeat logfile
+if len(sys.argv) == 2:
+    log_file = sys.argv[1]
+
+# remove logfile if it already exists
+if os.path.exists(log_file):
+    os.remove(log_file)
 
 # open log for writing.
 try:
@@ -26,7 +28,7 @@ except(IOError) as error:
 
 #open a socket on port config.tcp_port
 with heartbeat_log, socket.socket(socket.AF_INET, socket.SOCK_STREAM) as receiver_soc:
-    receiver_soc.bind((ip, TCP_PORT))
+    receiver_soc.bind((LISTENER_IP, TCP_PORT))
     receiver_soc.listen()
     print(f"Listening on {TCP_PORT}")
 

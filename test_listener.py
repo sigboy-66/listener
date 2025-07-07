@@ -14,7 +14,7 @@ import time
 import os
 import pytest
 from datetime import datetime
-from config import HEARTBEAT_INTERVAL, BEATS
+from config import HEARTBEAT_INTERVAL, BEATS, DEFAULT_LOG
 
 receiver_exe = "receiver.py"
 sender_exe = "sender.py"
@@ -42,6 +42,20 @@ def get_correct_pyhthon():
         return "python3"
     else:
         return "python"
+
+def wait_for_process_to_complete(monitoring_proc, process_name):
+    """checks ever HEARTBEAT_INTERVAL till the given process proc finishes if not wait 2x times BEATS sent and kill them"""
+    wait_count = 0
+    print(f"Waiting for {process_name} to complete")
+    while monitoring_proc.poll() is None:
+        print(f"{process_name} is still running")
+        time.sleep(HEARTBEAT_INTERVAL)
+        if wait_count == BEATS * 2:
+            print(f"The {process_name} is taking to long killing the process")
+            monitoring_proc.terminate()
+            monitoring_proc.wait(timeout=5)
+            break
+        wait_count += 1
 
 def test_heartbeat_logged_correctly():
     """Test basic heartbeat logging to file."""
@@ -94,11 +108,10 @@ def test_sender_receives_all_heartbeats():
         stderr=subprocess.PIPE,
         text=True
     )
-    print("Waiting for sender to stop!!!")
-    # wait for the sender to terminate
-    while sender.poll() is None:
-        print("Sender is still running")
-        time.sleep(HEARTBEAT_INTERVAL)
+
+    # wait for sender to stop
+    wait_for_process_to_complete(sender, "sender")
+
     print("Analyzing log file")
     count = 0
     # validate getting the packets in order
@@ -134,12 +147,11 @@ def test_receiver_heartbeats_received_timestamped_every_5_seconds_from_sender():
         stderr=subprocess.PIPE,
         text=True
     )
-    print("Waiting for sender to stop!!!")
-    # wait for the sender to terminate
-    while sender.poll() is None:
-        print("Sender is still running")
-        time.sleep(HEARTBEAT_INTERVAL)
-    print("Analyzing log file")
+    # Wait for receiver to be ready
+    time.sleep(2.5)
+    #wait for the sender to terminate
+    wait_for_process_to_complete(sender, "sender")
+
     count = 0
     # Validate that the consecutive timestamps sent from the sender are 3 seconds apart
     with open(log_file, 'r') as file:
@@ -160,19 +172,34 @@ def test_receiver_heartbeats_received_timestamped_every_5_seconds_from_sender():
 
     os.remove(log_file)
 
-def test_missing_log_path_to_receiver():
+def test_missing_log_path_to_receiver_use_default_log_file():
     """Test receiver fails if log path is missing."""
-    print("Testing graceful exit of receiver if no log file is provided on the command line.")
-    result = subprocess.run(
+    print("Testing if default log file created if no log file is provided on the command line.")
+    # remove default log if it exists already
+    if os.path.exists(DEFAULT_LOG):
+        os.remove(DEFAULT_LOG)
+
+    receiver = subprocess.Popen(
         [get_correct_pyhthon(), receiver_exe],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
     )
-    assert "Usage" in result.stdout or "Usage" in result.stderr
+
+    sender = subprocess.Popen(
+        [get_correct_pyhthon(), sender_exe, "1"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    wait_for_process_to_complete(sender, "sender")
 
 
-def test_sender_no_reciever():
+    assert os.path.exists(DEFAULT_LOG)
+    os.remove(DEFAULT_LOG)
+
+def test_sender_no_receiver():
     """Sender should fail to connect if receiver is down."""
     print("Testing sender exits if sender is not up.")
     result = subprocess.run(

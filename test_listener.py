@@ -147,8 +147,7 @@ def test_receiver_heartbeats_received_timestamped_every_5_seconds_from_sender():
         stderr=subprocess.PIPE,
         text=True
     )
-    # Wait for receiver to be ready
-    time.sleep(2.5)
+
     #wait for the sender to terminate
     wait_for_process_to_complete(sender, "sender")
 
@@ -185,7 +184,8 @@ def test_missing_log_path_to_receiver_use_default_log_file():
         stderr=subprocess.PIPE,
         text=True
     )
-
+    # wait for sender to come up
+    time.sleep(2.5)
     sender = subprocess.Popen(
         [get_correct_pyhthon(), sender_exe, "1"],
         stdout=subprocess.PIPE,

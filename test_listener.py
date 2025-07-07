@@ -117,7 +117,7 @@ def test_sender_receives_all_heartbeats():
 
 def test_receiver_heartbeats_received_timestamped_every_5_seconds_from_sender():
     """Validate a heart beat was received was time stamped every 5 seconds from the sender"""
-    print(f"Testing the receiver gets the hearbeats stamped every {HEARTBEAT_INTERVAL} seconds.")
+    print(f"Testing the receiver gets the heartbeats stamped every {HEARTBEAT_INTERVAL} seconds.")
     log_file = "listener3.log"
 
     receiver = subprocess.Popen(

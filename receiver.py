@@ -7,7 +7,7 @@
 import socket
 import sys
 from datetime import datetime
-from config import tcp_port
+from config import TCP_PORT
 
 # expect a log file path
 if len(sys.argv) != 2:
@@ -26,9 +26,9 @@ except(IOError) as error:
 
 #open a socket on port config.tcp_port
 with heartbeat_log, socket.socket(socket.AF_INET, socket.SOCK_STREAM) as receiver_soc:
-    receiver_soc.bind((ip, tcp_port))
+    receiver_soc.bind((ip, TCP_PORT))
     receiver_soc.listen()
-    print(f"Listening on {ip}:{tcp_port}")
+    print(f"Listening on {TCP_PORT}")
 
     connection, address = receiver_soc.accept()
     with connection:

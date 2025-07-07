@@ -1,5 +1,5 @@
 # Module:       test_listener.py
-# Description:  Uses pytest to test the tcp sender receiver are fuctioning correctly. Test run are
+# Description:  Uses pytest to test the tcp sender receiver are functioning correctly. Test run are
 #               1. Receiver logs heartbeat correctly.
 #               2. All sender heartbeats are received
 #               3. All sender heartbeat that are sent are timestamped the correct number of seconds apart
@@ -14,7 +14,7 @@ import time
 import os
 import pytest
 from datetime import datetime
-from config import heartbeat_interval, num_beats
+from config import HEARTBEAT_INTERVAL, BEATS
 
 receiver_exe = "receiver.py"
 sender_exe = "sender.py"
@@ -64,7 +64,7 @@ def test_heartbeat_logged_correctly():
         text=True
     )
 
-    time.sleep(heartbeat_interval + 2)  # Let at least one heartbeat be sent
+    time.sleep(HEARTBEAT_INTERVAL + 2)  # Let at least one heartbeat be sent
 
     kill_processes(sender, receiver)
 
@@ -77,8 +77,7 @@ def test_heartbeat_logged_correctly():
 
 def test_sender_receives_all_heartbeats():
     """Send 10 heart beats see if 10 are logged with heartbeat number"""
-    global num_beats
-    print(f"Testing receiver gets all {num_beats} heartbeats from the sender.")
+    print(f"Testing receiver gets all {BEATS} heartbeats from the sender.")
     log_file = "listener2.log"
 
     receiver = subprocess.Popen(
@@ -90,7 +89,7 @@ def test_sender_receives_all_heartbeats():
     print("sleep 2.5 sec for receiver to be up")
     time.sleep(2.5)
     sender = subprocess.Popen(
-        [get_correct_pyhthon(), sender_exe, str(num_beats)],
+        [get_correct_pyhthon(), sender_exe, str(BEATS)],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
@@ -99,7 +98,7 @@ def test_sender_receives_all_heartbeats():
     # wait for the sender to terminate
     while sender.poll() is None:
         print("Sender is still running")
-        time.sleep(heartbeat_interval)
+        time.sleep(HEARTBEAT_INTERVAL)
     print("Analyzing log file")
     count = 0
     # validate getting the packets in order
@@ -108,7 +107,7 @@ def test_sender_receives_all_heartbeats():
             assert f"HEARTBEAT {count}" in line
             count += 1
 
-    assert count == num_beats
+    assert count == BEATS
 
     # make sure sender receiver dead before moving on
     kill_processes(sender, receiver)
@@ -118,9 +117,9 @@ def test_sender_receives_all_heartbeats():
 
 def test_receiver_heartbeats_received_timestamped_every_5_seconds_from_sender():
     """Validate a heart beat was received was time stamped every 5 seconds from the sender"""
-    print(f"Testing the receiver gets the hearbeats stamped every {heartbeat_interval} seconds.")
+    print(f"Testing the receiver gets the hearbeats stamped every {HEARTBEAT_INTERVAL} seconds.")
     log_file = "listener3.log"
-    global num_beats
+
     receiver = subprocess.Popen(
         [get_correct_pyhthon(), receiver_exe, log_file],
         stdout=subprocess.PIPE,
@@ -130,7 +129,7 @@ def test_receiver_heartbeats_received_timestamped_every_5_seconds_from_sender():
 
     time.sleep(2.5)
     sender = subprocess.Popen(
-        [get_correct_pyhthon(), sender_exe, str(num_beats)],
+        [get_correct_pyhthon(), sender_exe, str(BEATS)],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True
@@ -139,7 +138,7 @@ def test_receiver_heartbeats_received_timestamped_every_5_seconds_from_sender():
     # wait for the sender to terminate
     while sender.poll() is None:
         print("Sender is still running")
-        time.sleep(heartbeat_interval)
+        time.sleep(HEARTBEAT_INTERVAL)
     print("Analyzing log file")
     count = 0
     # Validate that the consecutive timestamps sent from the sender are 3 seconds apart
@@ -152,7 +151,7 @@ def test_receiver_heartbeats_received_timestamped_every_5_seconds_from_sender():
                 curr_timestamp = get_time_stamp(line) # fetch the senders timestamp out of the receivers log
                 time_delta = datetime.fromisoformat(curr_timestamp) - datetime.fromisoformat(prev_timestamp)
                 print(f"Time dela is {time_delta.total_seconds()}")
-                assert round(time_delta.total_seconds()) == heartbeat_interval
+                assert round(time_delta.total_seconds()) == HEARTBEAT_INTERVAL
                 prev_timestamp = curr_timestamp
             count += 1
 

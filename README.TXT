@@ -19,7 +19,7 @@ the command line. It can simply be started by executing the following command li
 python receiver.py <path-to-heartbeat-log>
 
 The receiver must be started first. The sender.py sends the specified number of heartbeats on the command line over the
-tcp socket. If no number is supplied it will default to 1000 hearbeats. The heartbeats are sent at a time interval
+tcp socket. If no number is supplied it will default to 100 heartbeats. The heartbeats are sent at a time interval
 specified by heartbeat_interval in config.py. The sender can be started by executing the following command line.
 
 python sender.py <number-of-heartbeats-to-send
@@ -41,6 +41,6 @@ pytest --html=report.html --self-contained-html test_listener.py
 
 
 You can get the results in compiled report.html
-Add the -s arguement to pytest command for debug messages
+Add the -s argument to pytest command for debug messages
 
 
